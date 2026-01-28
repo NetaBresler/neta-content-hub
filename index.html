@@ -1,63 +1,103 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Miki's LinkedIn Hub 🐭</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Assistant', sans-serif; background-color: #f3f4f6; }
-        .post-card { transition: transform 0.2s, box-shadow 0.2s; }
-        .post-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .post-card { transition: all 0.3s ease; }
+        .post-card:hover { border-color: #3b82f6; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        .record-glow { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         [v-cloak] { display: none; }
     </style>
 </head>
-<body class="p-6">
-    <div id="app" v-cloak class="max-w-6xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm gap-4">
+<body class="p-4 md:p-8">
+    <div id="app" v-cloak class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-end mb-12 border-b border-slate-200 pb-8">
             <div>
-                <h1 class="text-3xl font-bold text-gray-800 text-center md:text-right">Miki's Content Hub 🐭</h1>
-                <p class="text-gray-500 mt-1 text-center md:text-right">ניהול גאנט פוסטים - {{ posts.length }} פוסטים מתוכננים</p>
+                <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">Content Hub 🐭</h1>
+                <p class="text-slate-500 mt-2 font-medium">LinkedIn Strategy & Gantt for Neta Bresler</p>
             </div>
-            <div class="flex gap-4">
-                <button @click="currentLang = 'HE'" :class="currentLang === 'HE' ? 'bg-blue-600 text-white' : 'bg-gray-100'" class="px-6 py-2 rounded-xl font-semibold transition">עברית</button>
-                <button @click="currentLang = 'EN'" :class="currentLang === 'EN' ? 'bg-blue-600 text-white' : 'bg-gray-100'" class="px-6 py-2 rounded-xl font-semibold transition">English</button>
-            </div>
+            <button @click="isAdding = true" class="bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-slate-800 transition shadow-lg shadow-slate-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                New Idea
+            </button>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div v-for="post in sortedPosts" :key="post.id" class="post-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span :class="getTypeClass(post.type)" class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">{{ post.type }}</span>
-                        <span class="text-xs text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded-md">{{ post.dateDisplay }}</span>
+        <!-- Feed List -->
+        <div class="space-y-8">
+            <div v-for="post in sortedPosts" :key="post.id" class="post-card bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col md:flex-row">
+                <!-- Image/Carousel Placeholder -->
+                <div class="w-full md:w-72 bg-slate-50 border-r border-slate-50 relative flex items-center justify-center min-h-[250px]">
+                    <div class="absolute top-4 left-4 z-10">
+                        <span class="bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold text-slate-500 shadow-sm">CAROUSEL PREVIEW</span>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ post.topic }}</h3>
-                    <p class="text-sm text-blue-800 font-semibold mb-3 border-r-4 border-blue-400 pr-3">{{ post.hook }}</p>
-                    
-                    <div class="bg-gray-50 p-3 rounded-xl mb-4 border border-gray-100 border-dashed">
-                        <span class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Visual Concept</span>
-                        <p class="text-xs text-gray-500 italic leading-relaxed">{{ post.visual }}</p>
+                    <!-- Mock Carousel Slides -->
+                    <div class="flex gap-2 p-4 overflow-hidden">
+                        <div v-for="n in 3" :key="n" class="w-48 h-64 bg-slate-200 rounded-xl flex-shrink-0 flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-300">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002-2z"/></svg>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
-                    <div class="flex gap-3">
-                        <button class="p-2 text-gray-400 hover:text-blue-500 transition" title="צפייה מלאה">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        </button>
-                        <button class="p-2 text-gray-400 hover:text-purple-500 transition" title="ייצר תמונה">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002-2z"/></svg>
+
+                <!-- Content Area -->
+                <div class="flex-1 p-8 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex gap-2">
+                                <span :class="getStrategyClass(post.strategy)" class="text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">{{ post.strategy }}</span>
+                                <span class="text-[11px] font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-full uppercase tracking-wider">{{ post.weeks_offset }}</span>
+                            </div>
+                            <span class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-xl">{{ post.dateDisplay }}</span>
+                        </div>
+                        
+                        <h2 class="text-2xl font-bold text-slate-900 mb-4">{{ post.topic }}</h2>
+                        <p class="text-slate-600 leading-relaxed mb-6 font-medium bg-slate-50 p-4 rounded-2xl border-l-4 border-blue-500 italic">
+                            "{{ post.hook }}"
+                        </p>
+
+                        <div class="space-y-2 mb-8">
+                            <div class="flex items-start gap-2">
+                                <span class="text-xs font-bold text-slate-400 uppercase w-20 mt-1">Chocolate</span>
+                                <p class="text-sm text-slate-700 flex-1">{{ post.magic }}</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-xs font-bold text-slate-400 uppercase w-20 mt-1">Broccoli</span>
+                                <p class="text-sm text-slate-700 flex-1">{{ post.business }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-between pt-6 border-t border-slate-50">
+                        <div class="flex gap-4">
+                            <button class="text-slate-400 hover:text-blue-500 transition font-semibold text-sm flex items-center gap-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                Copy Text
+                            </button>
+                            <button class="text-slate-400 hover:text-purple-500 transition font-semibold text-sm flex items-center gap-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002-2z"/></svg>
+                                AI Carousel
+                            </button>
+                        </div>
+                        <button class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">
+                            Generate Draft
                         </button>
                     </div>
-                    <button class="bg-gray-800 hover:bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold transition">
-                        Write Draft
-                    </button>
                 </div>
             </div>
         </div>
+
+        <!-- Float Recording Action for Mobile -->
+        <button class="fixed bottom-8 right-8 w-16 h-16 bg-red-500 text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition active:scale-95 z-50 record-glow">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd"/></svg>
+        </button>
     </div>
 
     <script>
@@ -65,42 +105,32 @@
 
         createApp({
             setup() {
-                const currentLang = ref('EN');
+                const isAdding = ref(false);
                 const posts = ref([
-                    { id: 1, lang: 'EN', date: '2026-02-03', dateDisplay: 'Feb 03', type: 'Mindset', topic: 'Manipulation is a Tool', hook: 'Manipulation is a survival skill', visual: 'A high-quality image of an invisible puppet master\'s hands controlling tech icons' },
-                    { id: 2, lang: 'EN', date: '2026-02-05', dateDisplay: 'Feb 05', type: 'Lead Magnet', topic: 'Convention Trance', hook: 'Why 99% walk past your booth', visual: 'A cinematic shot of a glowing tech booth in a dark hall with a crowd gathering' },
-                    { id: 3, lang: 'EN', date: '2026-02-08', dateDisplay: 'Feb 08', type: '.W.A.N.D.', topic: 'The W in WAND', hook: 'The Miracle of Wonder', visual: 'A vertical carousel: \'W is for Wonder\' - dark background with gold sparks' },
-                    { id: 4, lang: 'EN', date: '2026-02-10', dateDisplay: 'Feb 10', type: 'Mindset', topic: 'The Illusion of Choice', hook: 'Do users really choose?', visual: 'An abstract artistic representation of multiple paths leading to a single point' },
-                    { id: 5, lang: 'EN', date: '2026-02-12', dateDisplay: 'Feb 12', type: 'Lead Magnet', topic: 'The 60-Second Rule', hook: 'Why you only have 1 minute', visual: 'A high-end stopwatch made of digital light beams' },
-                    { id: 6, lang: 'EN', date: '2026-02-15', dateDisplay: 'Feb 15', type: '.W.A.N.D.', topic: 'The A in WAND', hook: 'Attention Management', visual: 'A vertical carousel: \'A is for Attention\' - a spotlight hitting a human brain' },
-                    { id: 7, lang: 'EN', date: '2026-02-17', dateDisplay: 'Feb 17', type: 'Mindset', topic: 'Chocolate Covered Broccoli', hook: 'The secret to communication', visual: 'A hyper-realistic 3D broccoli floret dipped in melting dark chocolate' },
-                    { id: 8, lang: 'EN', date: '2026-02-19', dateDisplay: 'Feb 19', type: 'Lead Magnet', topic: 'Trick vs Miracle', hook: 'Turning leads from Cold to Warm', visual: 'A split screen image: \'A Trick\' (boring) vs \'A Miracle\' (exploding with light)' },
-                    { id: 9, lang: 'EN', date: '2026-02-22', dateDisplay: 'Feb 22', type: '.W.A.N.D.', topic: 'The N in WAND', hook: 'Strategic Narrative', visual: 'A vertical carousel: \'N is for Narrative\' - an open book with holographic data flowing out' },
-                    { id: 10, lang: 'EN', date: '2026-02-24', dateDisplay: 'Feb 24', type: 'Mindset', topic: 'Deception & Security', hook: 'What magic knows about fraud', visual: 'A cyber-security shield made of playing cards' },
-                    { id: 11, lang: 'EN', date: '2026-02-26', dateDisplay: 'Feb 26', type: 'Case Study', topic: 'nSure.ai Case Study', hook: 'The Lead Form Hack', visual: 'A professional case study style image with the nSure.ai logo and a \'+200%\' stat' },
-                    { id: 12, lang: 'EN', date: '2026-03-01', dateDisplay: 'Mar 01', type: '.W.A.N.D.', topic: 'The D in WAND', hook: 'Overcoming Disbelief', visual: 'A vertical carousel: \'D is for Disbelief\' - a person jumping over a digital chasm of doubt' },
-                    { id: 13, lang: 'HE', date: '2026-02-02', dateDisplay: 'פב׳ 02', type: 'קשב', topic: 'הזרקור והחושך', hook: 'ב-1999 עשו ניסוי שהרס את מה שחשבנו על תשומת לב...', visual: 'אילוסטרציה של זרקור מאיר על גורילה בקהל חשוך' },
-                    { id: 14, lang: 'HE', date: '2026-02-05', dateDisplay: 'פב׳ 05', type: 'קשב', topic: 'משוואת החשיבות', hook: 'מה שמקבל תשומת לב נתפס כחשוב.', visual: 'קרוסלה: תשומת לב = ערך' }
+                    { id: 1, date: '2026-02-03', dateDisplay: 'Feb 03', weeks_offset: 'Week 1', strategy: 'Mindset', topic: 'Manipulation is a Tool', hook: 'Manipulation is a survival skill', magic: 'Psychology of Illusion', business: 'Moving from accidental to intentional influence' },
+                    { id: 2, date: '2026-02-05', dateDisplay: 'Feb 05', weeks_offset: 'Week 1', strategy: 'Lead Gen', topic: 'Convention Trance', hook: 'Why 99% walk past your booth', magic: 'Traffic stopping moments', business: 'Interactive demos that drive ROI' },
+                    { id: 3, date: '2026-02-08', dateDisplay: 'Feb 08', weeks_offset: 'Week 1', strategy: '.W.A.N.D.', topic: 'The W in WAND', hook: 'The Miracle of Wonder', magic: 'Magic as a bridge to curiosity', business: 'Using Wonder to break through skepticism' },
+                    { id: 4, date: '2026-02-10', dateDisplay: 'Feb 10', weeks_offset: 'Week 2', strategy: 'Mindset', topic: 'The Illusion of Choice', hook: 'Do users really choose?', magic: 'The "Force" in Card Magic', business: 'How to guide user decisions subconsciously' },
+                    { id: 5, date: '2026-02-12', dateDisplay: 'Feb 12', weeks_offset: 'Week 2', strategy: 'Lead Gen', topic: 'The 60-Second Rule', hook: 'Why you only have 1 minute', magic: 'Quick mentalism effects', business: 'Condensing your brand message into an impact moment' },
+                    { id: 6, date: '2026-02-15', dateDisplay: 'Feb 15', weeks_offset: 'Week 2', strategy: '.W.A.N.D.', topic: 'The A in WAND', hook: 'Attention Management', magic: 'Direction of focus', business: 'Controlling the narrative through attention' },
+                    { id: 7, date: '2026-02-17', dateDisplay: 'Feb 17', weeks_offset: 'Week 3', strategy: 'Education', topic: 'Chocolate Covered Broccoli', hook: 'The secret to communication', magic: 'Performance vs Content', business: 'Making complex tech simple and fun to learn' }
                 ]);
 
                 const sortedPosts = computed(() => {
-                    return posts.value
-                        .filter(p => p.lang === currentLang.value)
-                        .sort((a, b) => new Date(a.date) - new Date(b.date));
+                    return [...posts.value].sort((a, b) => new Date(a.date) - new Date(b.date));
                 });
 
-                const getTypeClass = (type) => {
+                const getStrategyClass = (s) => {
                     const classes = {
-                        'Mindset': 'bg-purple-50 text-purple-600',
-                        'Lead Magnet': 'bg-green-50 text-green-600',
-                        '.W.A.N.D.': 'bg-orange-50 text-orange-600',
-                        'Case Study': 'bg-red-50 text-red-600',
-                        'קשב': 'bg-blue-50 text-blue-600'
+                        'Mindset': 'bg-purple-100 text-purple-700',
+                        'Lead Gen': 'bg-green-100 text-green-700',
+                        '.W.A.N.D.': 'bg-orange-100 text-orange-700',
+                        'Education': 'bg-blue-100 text-blue-700'
                     };
-                    return classes[type] || 'bg-gray-50 text-gray-600';
+                    return classes[s] || 'bg-slate-100 text-slate-700';
                 };
 
-                return { currentLang, posts, sortedPosts, getTypeClass };
+                return { posts, sortedPosts, getStrategyClass, isAdding };
             }
         }).mount('#app');
     </script>
