@@ -16,51 +16,46 @@
 </head>
 <body class="p-6">
     <div id="app" v-cloak class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-gray-800">Miki's Content Hub 🐭</h1>
-                <p class="text-gray-500 mt-1">ניהול גאנט פוסטים ללינקדאין - נטע ברסלר</p>
+                <h1 class="text-3xl font-bold text-gray-800 text-center md:text-right">Miki's Content Hub 🐭</h1>
+                <p class="text-gray-500 mt-1 text-center md:text-right">ניהול גאנט פוסטים - {{ posts.length }} פוסטים מתוכננים</p>
             </div>
             <div class="flex gap-4">
-                <button @click="currentLang = 'HE'" :class="currentLang === 'HE' ? 'bg-blue-600 text-white' : 'bg-gray-100'" class="px-4 py-2 rounded-xl font-semibold transition">עברית</button>
-                <button @click="currentLang = 'EN'" :class="currentLang === 'EN' ? 'bg-blue-600 text-white' : 'bg-gray-100'" class="px-4 py-2 rounded-xl font-semibold transition">English</button>
+                <button @click="currentLang = 'HE'" :class="currentLang === 'HE' ? 'bg-blue-600 text-white' : 'bg-gray-100'" class="px-6 py-2 rounded-xl font-semibold transition">עברית</button>
+                <button @click="currentLang = 'EN'" :class="currentLang === 'EN' ? 'bg-blue-600 text-white' : 'bg-gray-100'" class="px-6 py-2 rounded-xl font-semibold transition">English</button>
             </div>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div v-for="post in filteredPosts" :key="post.id" class="post-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div v-for="post in sortedPosts" :key="post.id" class="post-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
                 <div>
                     <div class="flex justify-between items-start mb-4">
-                        <span class="text-xs font-bold text-blue-500 uppercase tracking-wider bg-blue-50 px-2 py-1 rounded-md">{{ post.theme }}</span>
-                        <span class="text-xs text-gray-400 font-mono">{{ post.date }}</span>
+                        <span :class="getTypeClass(post.type)" class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">{{ post.type }}</span>
+                        <span class="text-xs text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded-md">{{ post.dateDisplay }}</span>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-3">{{ post.title }}</h3>
-                    <p class="text-sm text-gray-600 line-clamp-3 mb-4 leading-relaxed italic border-r-2 border-blue-200 pr-3">
-                        "{{ post.hook }}"
-                    </p>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ post.topic }}</h3>
+                    <p class="text-sm text-blue-800 font-semibold mb-3 border-r-4 border-blue-400 pr-3">{{ post.hook }}</p>
+                    
+                    <div class="bg-gray-50 p-3 rounded-xl mb-4 border border-gray-100 border-dashed">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Visual Concept</span>
+                        <p class="text-xs text-gray-500 italic leading-relaxed">{{ post.visual }}</p>
+                    </div>
                 </div>
                 
                 <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
-                    <div class="flex gap-2">
+                    <div class="flex gap-3">
                         <button class="p-2 text-gray-400 hover:text-blue-500 transition" title="צפייה מלאה">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </button>
-                        <button class="p-2 text-gray-400 hover:text-green-500 transition" title="העתק תוכן">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                        <button class="p-2 text-gray-400 hover:text-purple-500 transition" title="ייצר תמונה">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002-2z"/></svg>
                         </button>
                     </div>
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold transition">
-                        כתוב טיוטה
+                    <button class="bg-gray-800 hover:bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold transition">
+                        Write Draft
                     </button>
                 </div>
-            </div>
-
-            <!-- New Idea Placeholder -->
-            <div class="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center p-8 text-gray-400 hover:border-blue-300 hover:text-blue-400 transition cursor-pointer group min-h-[250px]">
-                <div class="w-12 h-12 rounded-full border-2 border-dashed border-gray-200 flex items-center justify-center mb-4 group-hover:border-blue-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                </div>
-                <span class="text-sm font-semibold">הוסף רעיון חדש</span>
             </div>
         </div>
     </div>
@@ -70,20 +65,42 @@
 
         createApp({
             setup() {
-                const currentLang = ref('HE');
+                const currentLang = ref('EN');
                 const posts = ref([
-                    { id: 1, lang: 'HE', theme: 'Attention', title: 'הזרקור והחושך', hook: 'ב-1999 עשו ניסוי שהרס את מה שחשבנו על תשומת לב...', date: '02/02' },
-                    { id: 2, lang: 'HE', theme: 'Attention', title: 'משוואת החשיבות', hook: 'מה שמקבל תשומת לב נתפס כחשוב. מה שנתפס כחשוב מקבל תשומת לב.', date: '05/02' },
-                    { id: 3, lang: 'HE', theme: 'Certainty', title: 'ודאות ≠ אמת', hook: 'הלקוחות שלכם לא מחפשים את האמת. הם מחפשים ודאות.', date: '09/02' },
-                    { id: 4, lang: 'EN', theme: 'Strategy', title: 'The "Box" Fallacy', hook: 'Everyone tells you to think outside the box. They are wrong.', date: 'Tue' },
-                    { id: 5, lang: 'EN', theme: 'Strategy', title: 'Attention is a Searchlight', hook: 'You aren\'t losing customers; you\'re losing their searchlight.', date: 'Thu' }
+                    { id: 1, lang: 'EN', date: '2026-02-03', dateDisplay: 'Feb 03', type: 'Mindset', topic: 'Manipulation is a Tool', hook: 'Manipulation is a survival skill', visual: 'A high-quality image of an invisible puppet master\'s hands controlling tech icons' },
+                    { id: 2, lang: 'EN', date: '2026-02-05', dateDisplay: 'Feb 05', type: 'Lead Magnet', topic: 'Convention Trance', hook: 'Why 99% walk past your booth', visual: 'A cinematic shot of a glowing tech booth in a dark hall with a crowd gathering' },
+                    { id: 3, lang: 'EN', date: '2026-02-08', dateDisplay: 'Feb 08', type: '.W.A.N.D.', topic: 'The W in WAND', hook: 'The Miracle of Wonder', visual: 'A vertical carousel: \'W is for Wonder\' - dark background with gold sparks' },
+                    { id: 4, lang: 'EN', date: '2026-02-10', dateDisplay: 'Feb 10', type: 'Mindset', topic: 'The Illusion of Choice', hook: 'Do users really choose?', visual: 'An abstract artistic representation of multiple paths leading to a single point' },
+                    { id: 5, lang: 'EN', date: '2026-02-12', dateDisplay: 'Feb 12', type: 'Lead Magnet', topic: 'The 60-Second Rule', hook: 'Why you only have 1 minute', visual: 'A high-end stopwatch made of digital light beams' },
+                    { id: 6, lang: 'EN', date: '2026-02-15', dateDisplay: 'Feb 15', type: '.W.A.N.D.', topic: 'The A in WAND', hook: 'Attention Management', visual: 'A vertical carousel: \'A is for Attention\' - a spotlight hitting a human brain' },
+                    { id: 7, lang: 'EN', date: '2026-02-17', dateDisplay: 'Feb 17', type: 'Mindset', topic: 'Chocolate Covered Broccoli', hook: 'The secret to communication', visual: 'A hyper-realistic 3D broccoli floret dipped in melting dark chocolate' },
+                    { id: 8, lang: 'EN', date: '2026-02-19', dateDisplay: 'Feb 19', type: 'Lead Magnet', topic: 'Trick vs Miracle', hook: 'Turning leads from Cold to Warm', visual: 'A split screen image: \'A Trick\' (boring) vs \'A Miracle\' (exploding with light)' },
+                    { id: 9, lang: 'EN', date: '2026-02-22', dateDisplay: 'Feb 22', type: '.W.A.N.D.', topic: 'The N in WAND', hook: 'Strategic Narrative', visual: 'A vertical carousel: \'N is for Narrative\' - an open book with holographic data flowing out' },
+                    { id: 10, lang: 'EN', date: '2026-02-24', dateDisplay: 'Feb 24', type: 'Mindset', topic: 'Deception & Security', hook: 'What magic knows about fraud', visual: 'A cyber-security shield made of playing cards' },
+                    { id: 11, lang: 'EN', date: '2026-02-26', dateDisplay: 'Feb 26', type: 'Case Study', topic: 'nSure.ai Case Study', hook: 'The Lead Form Hack', visual: 'A professional case study style image with the nSure.ai logo and a \'+200%\' stat' },
+                    { id: 12, lang: 'EN', date: '2026-03-01', dateDisplay: 'Mar 01', type: '.W.A.N.D.', topic: 'The D in WAND', hook: 'Overcoming Disbelief', visual: 'A vertical carousel: \'D is for Disbelief\' - a person jumping over a digital chasm of doubt' },
+                    { id: 13, lang: 'HE', date: '2026-02-02', dateDisplay: 'פב׳ 02', type: 'קשב', topic: 'הזרקור והחושך', hook: 'ב-1999 עשו ניסוי שהרס את מה שחשבנו על תשומת לב...', visual: 'אילוסטרציה של זרקור מאיר על גורילה בקהל חשוך' },
+                    { id: 14, lang: 'HE', date: '2026-02-05', dateDisplay: 'פב׳ 05', type: 'קשב', topic: 'משוואת החשיבות', hook: 'מה שמקבל תשומת לב נתפס כחשוב.', visual: 'קרוסלה: תשומת לב = ערך' }
                 ]);
 
-                const filteredPosts = computed(() => {
-                    return posts.value.filter(p => p.lang === currentLang.value);
+                const sortedPosts = computed(() => {
+                    return posts.value
+                        .filter(p => p.lang === currentLang.value)
+                        .sort((a, b) => new Date(a.date) - new Date(b.date));
                 });
 
-                return { currentLang, posts, filteredPosts };
+                const getTypeClass = (type) => {
+                    const classes = {
+                        'Mindset': 'bg-purple-50 text-purple-600',
+                        'Lead Magnet': 'bg-green-50 text-green-600',
+                        '.W.A.N.D.': 'bg-orange-50 text-orange-600',
+                        'Case Study': 'bg-red-50 text-red-600',
+                        'קשב': 'bg-blue-50 text-blue-600'
+                    };
+                    return classes[type] || 'bg-gray-50 text-gray-600';
+                };
+
+                return { currentLang, posts, sortedPosts, getTypeClass };
             }
         }).mount('#app');
     </script>
