@@ -10,93 +10,105 @@
     <style>
         body { font-family: 'Outfit', sans-serif; background-color: #0c0c0e; color: #e2e8f0; }
         .post-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .post-card:hover { border-color: #3b82f6; background-color: #16161a; }
-        .record-glow { animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .expand-enter-active, .expand-leave-active { transition: all 0.3s ease; max-height: 1000px; opacity: 1; }
+        .expand-enter-from, .expand-leave-to { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; }
         [v-cloak] { display: none; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0c0c0e; }
-        ::-webkit-scrollbar-thumb { background: #2d2d35; border-radius: 10px; }
     </style>
 </head>
 <body class="p-4 md:p-10">
-    <div id="app" v-cloak class="max-w-3xl mx-auto">
+    <div id="app" v-cloak class="max-w-3xl mx-auto pb-32">
         <!-- Header -->
         <header class="flex justify-between items-center mb-16 px-2">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight text-white mb-1">Neta's Content Hub 🐭</h1>
-                <p class="text-slate-500 font-medium text-sm">Strategic Gantt for Neta Bresler</p>
+                <p class="text-slate-500 font-medium text-sm">Strategic Gantt & Creation Lab</p>
             </div>
         </header>
 
         <!-- Feed List -->
-        <div class="space-y-12">
-            <div v-for="post in posts" :key="post.id" class="post-card bg-[#121214] rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col">
+        <div class="space-y-10">
+            <div v-for="post in posts" :key="post.id" class="post-card bg-[#121214] rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col shadow-2xl">
                 
-                <!-- Visual Header (Always Top on Mobile, Large on Desktop) -->
-                <div class="w-full bg-[#1a1a1e] p-6 flex gap-4 overflow-x-auto no-scrollbar border-b border-white/5">
-                    <div v-for="n in 3" :key="n" class="w-64 h-80 rounded-3xl glass flex-shrink-0 flex items-center justify-center text-slate-700 bg-black/20">
-                         <div class="text-center p-6">
-                            <svg class="w-10 h-10 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002-2z"/></svg>
-                            <p class="text-[10px] font-bold uppercase tracking-widest opacity-30">Slide {{n}} Preview</p>
+                <!-- Compact Visual Carousel (Half-Height) -->
+                <div class="w-full bg-[#1a1a1e] p-4 flex gap-3 overflow-x-auto no-scrollbar border-b border-white/5">
+                    <div v-for="n in 4" :key="n" @click="zoomImg = n" class="w-40 h-52 rounded-2xl glass flex-shrink-0 flex items-center justify-center cursor-pointer hover:border-blue-500/50 transition bg-black/20 group relative overflow-hidden">
+                         <div class="text-center p-4">
+                            <svg class="w-8 h-8 mx-auto mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002-2z"/></svg>
+                            <p class="text-[8px] font-bold uppercase tracking-widest opacity-30 italic">Click to Zoom</p>
                          </div>
+                         <div class="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition"></div>
                     </div>
-                    <div class="w-20 flex-shrink-0"></div> <!-- Padding end -->
+                    <div class="w-8 flex-shrink-0"></div>
                 </div>
 
                 <!-- Content Area -->
-                <div class="p-8 md:p-10 flex flex-col gap-6">
+                <div class="p-8 flex flex-col gap-6">
                     <div class="flex justify-between items-center">
                         <div class="flex gap-2">
-                            <span :class="getStrategyClass(post.strategy)" class="text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">{{ post.strategy }}</span>
-                            <span class="text-[10px] font-bold bg-white/5 text-slate-400 px-3 py-1.5 rounded-full uppercase tracking-widest">{{ post.weeks_offset }}</span>
+                            <span :class="getStrategyClass(post.strategy)" class="text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest leading-none">{{ post.strategy }}</span>
+                            <span class="text-[10px] font-bold bg-white/5 text-slate-400 px-3 py-1.5 rounded-full uppercase tracking-widest leading-none">{{ post.weeks_offset }}</span>
                         </div>
-                        <span class="text-xs font-mono text-blue-500 font-bold px-3 py-1 bg-blue-500/10 rounded-lg">{{ post.dateDisplay }}</span>
+                        <span class="text-[11px] font-mono text-blue-500 font-bold px-3 py-1.5 border border-blue-500/20 rounded-xl leading-none tracking-tighter">{{ post.dateDisplay }}</span>
                     </div>
                     
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">{{ post.topic }}</h2>
-                        <div class="bg-white/5 p-6 rounded-[2rem] border-l-4 border-blue-600 mb-6">
-                            <p class="text-lg text-slate-200 leading-relaxed italic font-light italic">"{{ post.hook }}"</p>
+                    <div @click="post.expanded = !post.expanded" class="cursor-pointer group">
+                        <h2 class="text-2xl font-bold text-white mb-3 leading-tight group-hover:text-blue-400 transition">{{ post.topic }}</h2>
+                        <div class="bg-white/5 p-5 rounded-2xl border-l-[3px] border-blue-600 mb-2">
+                            <p class="text-[15px] text-slate-300 leading-relaxed font-light italic">"{{ post.hook }}"</p>
+                        </div>
+                        <div class="flex items-center gap-1 text-[10px] font-bold text-blue-500/50 uppercase tracking-widest pl-1 mt-2">
+                            <span>{{ post.expanded ? 'Click to collapse' : 'Click to see full draft' }}</span>
+                            <svg class="w-3 h-3 transition-transform" :class="post.expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div class="glass p-5 rounded-2xl">
-                            <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest block mb-2">The Chocolate</span>
-                            <p class="text-sm text-slate-300 leading-snug">{{ post.magic }}</p>
+                    <!-- Expandable Draft Content -->
+                    <transition name="expand">
+                        <div v-if="post.expanded" class="overflow-hidden">
+                            <div class="pt-2 pb-6 flex flex-col gap-6 border-t border-white/5 mt-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="glass p-5 rounded-2xl border-blue-500/10">
+                                        <span class="text-[9px] font-bold text-blue-500 uppercase tracking-widest block mb-2 opacity-70">The Chocolate (Magic)</span>
+                                        <p class="text-sm text-slate-300 leading-relaxed">{{ post.magic }}</p>
+                                    </div>
+                                    <div class="glass p-5 rounded-2xl border-green-500/10">
+                                        <span class="text-[9px] font-bold text-green-500 uppercase tracking-widest block mb-2 opacity-70">The Broccoli (Value)</span>
+                                        <p class="text-sm text-slate-300 leading-relaxed">{{ post.business }}</p>
+                                    </div>
+                                </div>
+                                <div v-if="post.fullDraft" class="bg-black/40 p-6 rounded-3xl border border-white/5">
+                                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-4">Latest AI Draft (Full)</span>
+                                    <p class="text-sm text-slate-200 whitespace-pre-wrap leading-loose font-light italic">{{ post.fullDraft }}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="glass p-5 rounded-2xl">
-                            <span class="text-[10px] font-bold text-green-500 uppercase tracking-widest block mb-2">The Broccoli</span>
-                            <p class="text-sm text-slate-300 leading-snug">{{ post.business }}</p>
-                        </div>
-                    </div>
+                    </transition>
 
                     <!-- Actions -->
-                    <div class="flex flex-wrap items-center gap-4 pt-6 border-t border-white/5">
-                        <button class="flex-1 bg-white text-black font-bold py-4 rounded-2xl hover:bg-slate-200 transition active:scale-[0.98]">
-                            Generate Draft
+                    <div class="flex flex-wrap items-center gap-3 pt-6 border-t border-white/5">
+                        <button @click="handleAction('draft', post)" class="flex-1 bg-white text-black font-bold py-4 rounded-2xl hover:bg-slate-200 transition active:scale-[0.98] text-sm uppercase tracking-wide">
+                            {{ post.loadingDraft ? 'Writing...' : 'Generate New Draft' }}
                         </button>
-                        <div class="flex gap-2">
-                            <button class="glass p-4 rounded-2xl hover:bg-white/10 transition" title="Copy Content">
-                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                            </button>
-                            <button class="glass p-4 rounded-2xl hover:bg-white/10 transition text-purple-400" title="AI Images">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002-2z"/></svg>
-                            </button>
-                        </div>
+                        <button @click="handleAction('image', post)" class="glass px-6 py-4 rounded-2xl hover:bg-white/10 transition text-purple-400 border-purple-500/20 flex items-center justify-center" title="AI Carousel">
+                            <svg v-if="!post.loadingImg" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002-2z"/></svg>
+                            <span v-else class="text-[10px] font-bold animate-pulse uppercase tracking-tighter">AI...</span>
+                        </button>
+                        <button class="glass p-4 rounded-2xl hover:bg-white/10 transition border-white/10 flex items-center justify-center" title="Copy Content">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Floating Mic Action -->
-        <div class="fixed bottom-10 inset-x-0 flex justify-center pointer-events-none z-50">
-             <button @click="handleRecord" class="pointer-events-auto w-20 h-20 bg-red-600 text-white rounded-full flex items-center justify-center shadow-[0_0_50px_-12px_rgba(239,68,68,0.5)] hover:scale-110 active:scale-90 transition-all record-glow">
-                <svg v-if="!isRecording" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"/></svg>
-                <div v-else class="w-6 h-6 bg-white rounded-sm"></div>
-            </button>
+        <!-- Lightbox Zoom -->
+        <div v-if="zoomImg" @click="zoomImg = null" class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6 transition-all duration-500 animate-in fade-in zoom-in">
+            <div class="relative w-full max-w-2xl aspect-[4/5] rounded-[3rem] glass flex items-center justify-center">
+                <svg class="w-20 h-20 text-white/5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002-2z"/></svg>
+                <p class="absolute bottom-10 text-white uppercase tracking-widest font-bold opacity-20">Full Size Preview (Demo)</p>
+            </div>
         </div>
     </div>
 
@@ -105,37 +117,50 @@
 
         createApp({
             setup() {
-                const isRecording = ref(false);
+                const zoomImg = ref(null);
                 const posts = ref([
-                    { id: 0, date: '2026-01-28', dateDisplay: 'TODAY', weeks_offset: 'New Idea', strategy: 'Authority', topic: 'Growing Out of Your Own Dreams', hook: "I'm officially living my dream. The only problem? It's the dream I had five years ago.", magic: 'Dissolving the Map', business: 'Exposing cognitive blind spots in leadership' },
-                    { id: 1, date: '2026-02-03', dateDisplay: 'Feb 03', weeks_offset: 'Week 1', strategy: 'Mindset', topic: 'Manipulation is a Tool', hook: 'Manipulation is a survival skill', magic: 'Psychology of Illusion', business: 'Moving from accidental to intentional influence' },
-                    { id: 2, date: '2026-02-05', dateDisplay: 'Feb 05', weeks_offset: 'Week 1', strategy: 'Lead Gen', topic: 'Convention Trance', hook: 'Why 99% walk past your booth', magic: 'Traffic stopping moments', business: 'Interactive demos that drive ROI' },
-                    { id: 3, date: '2026-02-08', dateDisplay: 'Feb 08', weeks_offset: 'Week 1', strategy: '.W.A.N.D.', topic: 'The W in WAND', hook: 'The Miracle of Wonder', magic: 'Magic as a bridge to curiosity', business: 'Using Wonder to break through skepticism' },
-                    { id: 4, date: '2026-02-10', dateDisplay: 'Feb 10', weeks_offset: 'Week 2', strategy: 'Mindset', topic: 'The Illusion of Choice', hook: 'Do users really choose?', magic: 'The "Force" in Card Magic', business: 'How to guide user decisions subconsciously' },
-                    { id: 5, date: '2026-02-12', dateDisplay: 'Feb 12', weeks_offset: 'Week 2', strategy: 'Lead Gen', topic: 'The 60-Second Rule', hook: 'Why you only have 1 minute', magic: 'Quick mentalism effects', business: 'Condensing your brand message into an impact moment' },
-                    { id: 6, date: '2026-02-15', dateDisplay: 'Feb 15', weeks_offset: 'Week 2', strategy: '.W.A.N.D.', topic: 'The A in WAND', hook: 'Attention Management', magic: 'Direction of focus', business: 'Controlling the narrative through attention' },
-                    { id: 7, date: '2026-02-17', dateDisplay: 'Feb 17', weeks_offset: 'Week 3', strategy: 'Education', topic: 'Chocolate Covered Broccoli', hook: 'The secret to communication', magic: 'Performance vs Content', business: 'Making complex tech simple and fun to learn' }
+                    { 
+                        id: 0, 
+                        date: '2026-01-28', 
+                        dateDisplay: 'JAN 28', 
+                        weeks_offset: 'Newest', 
+                        strategy: 'Authority', 
+                        topic: 'Growing Out of Your Own Dreams', 
+                        hook: "I'm officially living my dream. The only problem? It's the dream I had five years ago.", 
+                        magic: 'Dissolving the Map: When what was once a miracle becomes background noise.', 
+                        business: 'Exposing cognitive blind spots in leadership and why we struggle to update our maps.',
+                        expanded: false,
+                        loadingDraft: false,
+                        loadingImg: false,
+                        fullDraft: "I’m officially living my dream. The only problem? It’s the dream I had five years ago.\n\nThere’s a strange dissonance in realizing you’ve reached the destination, only to find out you’ve already outgrown the map.\n\nFive years ago, being a \"magician\" was everything. Success was measured by the volume of applause and the number of \"How did you do that?\" in a corporate lobby.\n\nBut lately, the applause feels like static. Magic was never the goal—it was the laboratory. Today, I care about the Belief Architecture."
+                    },
+                    { id: 1, date: '2026-02-03', dateDisplay: 'FEB 03', weeks_offset: 'Week 1', strategy: 'Mindset', topic: 'Manipulation is a Tool', hook: 'Manipulation is a survival skill', magic: 'Psychology of Illusion', business: 'Moving from accidental to intentional influence', expanded: false },
+                    { id: 2, date: '2026-02-05', dateDisplay: 'FEB 05', weeks_offset: 'Week 1', strategy: 'Lead Gen', topic: 'Convention Trance', hook: 'Why 99% walk past your booth', magic: 'Traffic stopping moments', business: 'Interactive demos that drive ROI', expanded: false }
                 ]);
 
                 const getStrategyClass = (s) => {
                     const classes = {
                         'Mindset': 'bg-purple-500/20 text-purple-400',
                         'Lead Gen': 'bg-green-500/20 text-green-400',
-                        '.W.A.N.D.': 'bg-orange-500/20 text-orange-400',
+                        'Authority': 'bg-blue-500/20 text-blue-400',
                         'Education': 'bg-blue-500/20 text-blue-400'
                     };
                     return classes[s] || 'bg-white/5 text-slate-400';
                 };
 
-                const handleRecord = () => {
-                    isRecording.value = !isRecording.value;
-                    if(isRecording.value) {
-                        alert("🎙️ Record feature coming soon!\nFor now, just record your voice in Telegram and I'll update the Hub automatically.");
-                        setTimeout(() => isRecording.value = false, 1000);
+                const handleAction = (type, post) => {
+                    if(type === 'draft') {
+                        post.loadingDraft = true;
+                        alert(`🚀 Message sent to Miki!\nI'm writing your draft for "${post.topic}" right now. Check Telegram in a moment.`);
+                        setTimeout(() => { post.loadingDraft = false; post.expanded = true; }, 1500);
+                    } else {
+                        post.loadingImg = true;
+                        alert(`🎨 Visual request sent to Nano Banana Pro!\nGenerating carousel concepts for "${post.topic}".`);
+                        setTimeout(() => post.loadingImg = false, 1500);
                     }
                 };
 
-                return { posts, getStrategyClass, handleRecord, isRecording };
+                return { posts, zoomImg, getStrategyClass, handleAction };
             }
         }).mount('#app');
     </script>
